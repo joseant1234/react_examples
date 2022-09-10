@@ -1,40 +1,40 @@
+import { createContext } from 'react';
 import styles from '../styles/styles.module.css';
-import noImage from '../assets/no-image.jpg';
 import { useProduct } from '../hooks/useProduct';
+import { ProductCardProps, ProductContextProps } from '../interfaces/common';
 
-interface Props {
-    product: Product
-}
-interface Product {
-    id: string;
-    title: string;
-    img?: string;
-}
+
+export const ProductContext = createContext({} as ProductContextProps);
+const { Provider } = ProductContext;
+
 
 // al hacerlo como modulo esos estilos son unicos, los está encapsulando
-export const ProductCard = ({ product }: Props) => {
+export const ProductCard = ({ children, product }: ProductCardProps) => {
     const { counter, increaseBy } = useProduct();
 
     return (
-        <div className={styles.productCard}>
-            <img className={styles.productImg} src={product.img ? product.img : noImage } alt="Coffee Mug" />
-            {/* <img className={styles.productImg} src={noImage} alt="Coffee Mug" /> */}
-            <span className={styles.productDescription}>{ product.title }</span>
-            <div className={styles.buttonsContainer}>
-                <button
-                    className={styles.buttonMinus}
-                    onClick={() => increaseBy(-1)}>
-                    -
-                </button>
-                <div className={styles.countLabel}>
-                    { counter }
-                </div>
-                <button
-                    className={styles.buttonAdd}
-                    onClick={() => increaseBy(+1)}>
-                    +
-                </button>
+        <Provider value={{
+            counter,
+            increaseBy,
+            product
+        }}>
+             <div className={styles.productCard}>
+                { children }
+                {/* <ProductImage img={ product.img }/>
+
+                <ProductTitle title={ product.title } />
+
+                <ProductButtons
+                    increaseBy={increaseBy}
+                    counter={counter}
+                /> */}
             </div>
-        </div>
+        </ Provider>
     )
 }
+
+// al product card se le está agregando la propiedad Title
+// cuando estan en diferentes archivos no funciona asignarle directamente
+// ProductCard.Title = ProductTitle;
+// ProductCard.Image = ProductImage;
+// ProductCard.Buttons = ProductButtons;
