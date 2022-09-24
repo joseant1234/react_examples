@@ -1,43 +1,15 @@
-import { useState } from "react";
 import { ProductButtons, ProductCard, ProductImage, ProductTitle } from "../components"
-import { Product } from "../interfaces/common";
+import { products } from "../data/products";
+import { useShoppingCart } from "../hooks/useShoppingCart";
 import '../styles/custom-styles.css';
 
-const product1 = {
-  id: '1',
-  title: 'Coffee Mug - Card',
-  img: './coffee-mug.png',
-}
-
-const product2 = {
-  id: '2',
-  title: 'Coffee Mug - Meme',
-  img: './coffee-mug2.png',
-}
-
-const products: Product[] = [product1, product2];
-
-interface ProductInCart extends Product {
-  count: number;
-}
 
 export const ShoppingPage = () => {
 
-  const [shoppingCart, setShoppingCart] = useState<{ [key: string]: ProductInCart }>({});
-
-  const onProductCountChage = ({ count, product }: { count: number, product: Product}) => {
-    setShoppingCart(oldShoppingCart => {
-      if (count === 0) {
-        const { [product.id]:toDelete, ...rest } = oldShoppingCart;
-        return rest;
-      }
-
-      return {
-        ...oldShoppingCart,
-        [product.id]: {...product, count}
-      };
-    });
-  }
+  // con el patron control props se tiene control del estado del componente a través de las propiedades
+  // funciona similar a un < input value={}, onChange={} />
+  // con el value que lo recibe como props el componente ProductCard modifica su estado resultante del cálculo del onChange
+  const { shoppingCart, onProductCountChange } = useShoppingCart();
 
   return (
     <div>
@@ -55,7 +27,8 @@ export const ShoppingPage = () => {
                 product={product}
                 className="bg-dark text-white"
                 key={ product.id }
-                onChange={ onProductCountChage }
+                onChange={ onProductCountChange }
+                value={ shoppingCart[product.id]?.count || 0 }
               >
                 <ProductImage className="custom-image" style={{ boxShadow: '10px 10px 10px rgba(0, 0, 0, 0.2)' }} />
                 <ProductTitle className="text-bold" />
@@ -73,6 +46,8 @@ export const ShoppingPage = () => {
                 product={product}
                 className="bg-dark text-white"
                 style={{ width: '100px' }}
+                onChange={ onProductCountChange }
+                value={product.count}
               >
                 <ProductImage className="custom-image" style={{ boxShadow: '10px 10px 10px rgba(0, 0, 0, 0.2)' }} />
                 <ProductButtons
