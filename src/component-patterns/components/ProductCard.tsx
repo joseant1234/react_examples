@@ -1,7 +1,7 @@
 import { createContext, ReactElement, CSSProperties } from 'react';
 import styles from '../styles/styles.module.css';
 import { useProduct } from '../hooks/useProduct';
-import { onChangeArgs, Product, ProductContextProps } from '../interfaces/common';
+import { InitialValues, onChangeArgs, Product, ProductCardHandlers, ProductContextProps } from '../interfaces/common';
 
 
 export const ProductContext = createContext({} as ProductContextProps);
@@ -10,36 +10,40 @@ const { Provider } = ProductContext;
 // children es un array tambien porque puede recibir mas de un elemento
 export interface Props {
     product: Product;
-    children?: ReactElement | ReactElement[];
+    // children?: ReactElement | ReactElement[];
+    children: (args: ProductCardHandlers) => JSX.Element;
     className?: string;
     style?: CSSProperties;
     onChange?: (args: onChangeArgs) => void;
-    value?: number
+    value?: number;
+    initialValues?: InitialValues;
 }
 
 // al hacerlo como modulo esos estilos son unicos, los está encapsulando
-export const ProductCard = ({ children, product, className, style, onChange, value }: Props) => {
-    const { counter, increaseBy } = useProduct({ onChange, product, value });
+export const ProductCard = ({ children, product, className, style, onChange, value, initialValues }: Props) => {
+    const { counter, increaseBy, maxCount, isMaxCountReached, reset } = useProduct({ onChange, product, value, initialValues });
 
     return (
         <Provider value={{
             counter,
             increaseBy,
-            product
+            product,
+            maxCount
         }}>
             <div
                 className={`${styles.productCard} ${className}`}
                 style={ style }
             >
-                { children }
-                {/* <ProductImage img={ product.img }/>
-
-                <ProductTitle title={ product.title } />
-
-                <ProductButtons
-                    increaseBy={increaseBy}
-                    counter={counter}
-                /> */}
+                {
+                    children({
+                        count: counter,
+                        isMaxCountReached,
+                        maxCount: initialValues?.maxCount,
+                        product,
+                        increaseBy,
+                        reset,
+                    })
+                }
             </div>
         </ Provider>
     )
