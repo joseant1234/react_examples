@@ -1,4 +1,4 @@
-import { useField } from "formik"
+import { ErrorMessage, useField } from "formik"
 
 interface Props {
     label: string;
@@ -18,11 +18,12 @@ export const MyTextInput = ({ label, ...props }: Props) => {
         <>
             <label htmlFor={props.id || props.name}>{ label }</label>
             <input className="text-input" {...field} {...props}/>
-            {
+            <ErrorMessage name={ props.name } component="span" />
+            {/* {
                 meta.touched && meta.error && (
                     <span className="error">{ meta.error }</span>
                 )
-            }
+            } */}
         </>
     )
 }
